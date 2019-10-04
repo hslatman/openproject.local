@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+  op:
+    image: openproject/community:8
+    hostname: op
+    networks:
+      - default
+    depends_on:
+      - db
+    volumes:
+      - op-data:/var/openproject/static
+    environment:
+      - DATABASE_URL=postgres://${OP_POSTGRES_USER}:${OP_POSTGRES_PASSWORD}@db:5432/${OP_POSTGRES_DATABASE}
+    ports:
+      - "8080:80"  
+    
+  db:
+    image: postgres:9-alpine
+    hostname: db
+    networks:
+     - default
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+    environment:
+      - POSTGRES_DB=${OP_POSTGRES_DATABASE}
+      - POSTGRES_USER=${OP_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${OP_POSTGRES_PASSWORD}
+    ports:
+     - "5432:5432"
+
+volumes:
+  op-data: {}
+  db-data: {}
+
+networks:
+  default:
+    driver: bridge
